@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok LIVE — Aslan Yarışı</title>
+<style>
+:root{
+  --bg:#071d1b; --panel:#0c302b; --panel2:#0a2824; --line:#1e5b50;
+  --text:#f4fff8; --muted:#91b8ae; --accent:#ffb21c; --good:#48e08a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  background:radial-gradient(circle at 50% 0%,#174b42 0,#08231f 42%,#041513 100%);
+  color:var(--text); display:flex; justify-content:center; padding:20px;
+}
+.app{width:min(1050px,100%);}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+h1{font-size:24px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:4px}
+button,input,select{font:inherit}
+button{border:0;border-radius:12px;padding:11px 15px;background:var(--accent);color:#1a1200;font-weight:800;cursor:pointer}
+button.secondary{background:#163e38;color:#dff8ee;border:1px solid #28665b}
+.top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{padding:7px 10px;border-radius:999px;background:#123b34;border:1px solid #28665b;color:#ccefe4;font-size:12px}
+.badge.live{color:#08170f;background:#59e68e;border-color:#59e68e}
+.panel{background:linear-gradient(180deg,#0d342e,#092823);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #0006;overflow:hidden}
+.controls{padding:14px;display:grid;grid-template-columns:1fr auto;gap:10px;border-bottom:1px solid var(--line)}
+input{width:100%;background:#061c19;color:#fff;border:1px solid #28665b;border-radius:12px;padding:12px 14px;outline:none}
+input:focus{border-color:#65e99a}
+.race{padding:10px 0}
+.lane{
+  position:relative;min-height:126px;border-bottom:1px solid #1c5149;
+  background:linear-gradient(180deg,rgba(19,83,70,.42),rgba(7,43,37,.28));
+  overflow:hidden;
+}
+.lane:last-child{border-bottom:0}
+.track{position:absolute;left:120px;right:20px;top:18px;bottom:18px;border:1px solid #1d6255;border-radius:12px;background:repeating-linear-gradient(90deg,transparent 0 74px,#174e45 75px 76px)}
+.laneInfo{position:absolute;left:14px;top:16px;width:92px;z-index:3}
+.laneNo{font-size:11px;color:#83aa9f}.score{font-size:27px;font-weight:900;line-height:1.05}
+.laneName{font-size:11px;color:#b6d8cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.finish{position:absolute;right:18px;top:0;bottom:0;border-left:2px dashed #e5c76b66;width:3px}
+.lion{
+  position:absolute;left:4%;top:50%;transform:translateY(-50%);
+  width:92px;height:72px;display:flex;align-items:center;justify-content:center;
+  font-size:61px;filter:drop-shadow(0 7px 4px #0008);
+  transition:left .65s cubic-bezier(.2,.8,.2,1);z-index:2;
+}
+.lion .tag{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;background:#000a;border:1px solid #ffffff30;padding:2px 6px;border-radius:999px;white-space:nowrap}
+.eventlog{padding:12px;border-top:1px solid var(--line);background:#061b18}
+.logTitle{display:flex;justify-content:space-between;color:#a9cfc4;font-size:12px;margin-bottom:7px}
+.log{height:130px;overflow:auto;font-size:12px;display:flex;flex-direction:column;gap:5px}
+.log div{background:#0c2a25;border-radius:8px;padding:6px 8px;color:#d9eee8}
+.log b{color:#ffd36a}
+.legend{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;color:#8db7ad;font-size:11px}
+@media(max-width:650px){
+  body{padding:10px}.controls{grid-template-columns:1fr}
+  .track{left:105px}.laneInfo{width:78px}.lion{font-size:54px;width:78px}
+}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.hidden{display:none}
+.modalBox{width:min(460px,100%);background:#0b302a;border:1px solid #2c6d60;border-radius:20px;padding:22px;box-shadow:0 30px 90px #000b}
+.modalBox h2{margin:0 0 7px}.modalBox p{color:#9fc4ba;font-size:13px;line-height:1.5}
+.modalBox form{display:flex;gap:8px}.modalBox input{flex:1}
+.small{font-size:11px;color:#7da79d;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1>🦁 TikTok LIVE Aslan Yarışı</h1><div class="sub">Hediyeler geldikçe aslanlar otomatik ilerler.</div></div>
+    <div class="top"><span id="status" class="badge">Bağlantı yok</span><span id="userBadge" class="badge">@—</span></div>
+  </header>
+
+  <section class="panel">
+    <div class="controls">
+      <input id="username" placeholder="TikTok kullanıcı adı (örn. @kullanici)" autocomplete="off">
+      <div class="top"><button id="connectBtn">CANLIYA BAĞLAN</button><button id="demoBtn" class="secondary">DEMO</button></div>
+    </div>
+
+    <div id="race" class="race"></div>
+
+    <div class="legend">
+      <span>Hesaplama: hediye × tekrar × elmas</span>
+      <span>•</span><span>Her hediye varsayılan olarak en çok elmas değerine göre ilgili aslanı yürütür.</span>
+    </div>
+
+    <div class="eventlog">
+      <div class="logTitle"><span>SON HEDİYELER</span><span id="viewer">İzleyici: —</span></div>
+      <div id="log" class="log"></div>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modalBox">
+    <h2>🐯 TikTok kullanıcı adını gir</h2>
+    <p>Canlı yayındaki hediyeleri gerçek zamanlı takip etmek için kullanıcı adını yaz. Örn. <b>kullaniciadi</b> veya <b>@kullaniciadi</b>.</p>
+    <form id="startForm"><input id="modalUsername" placeholder="@kullaniciadi" autofocus><button>BAŞLA</button></form>
+    <div class="small">Not: Gerçek TikTok LIVE verisi için aşağıdaki Node.js sunucusunun çalışması gerekir.</div>
+  </div>
+</div>
+
+<script>
+const lanes = [
+  {name:"Aslan 1", emoji:"🦁", score:0},
+  {name:"Aslan 2", emoji:"🦁", score:0},
+  {name:"Aslan 3", emoji:"🦁", score:0},
+  {name:"Aslan 4", emoji:"🦁", score:0},
+  {name:"Aslan 5", emoji:"🦁", score:0}
+];
+const race = document.getElementById("race");
+const logEl = document.getElementById("log");
+const statusEl = document.getElementById("status");
+const viewerEl = document.getElementById("viewer");
+let es = null;
+
+function render(){
+  race.innerHTML = lanes.map((l,i)=>`
+    <div class="lane">
+      <div class="laneInfo">
+        <div class="laneNo">ASLAN ${i+1}</div>
+        <div class="score">${Math.round(l.score)}</div>
+        <div class="laneName">${escapeHtml(l.name)}</div>
+      </div>
+      <div class="track"></div>
+      <div class="finish"></div>
+      <div class="lion" id="lion${i}" style="left:${Math.min(86,4+l.score/12)}%">
+        <span>${l.emoji}</span><span class="tag">${Math.round(l.score)} puan</span>
+      </div>
+    </div>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function addLog(text){
+  const d=document.createElement("div"); d.innerHTML=text; logEl.prepend(d);
+  while(logEl.children.length>30) logEl.lastChild.remove();
+}
+function addGift(g){
+  // Server sends laneIndex if a mapping is configured; otherwise choose by giftId hash.
+  const lane = Number.isInteger(g.laneIndex) ? g.laneIndex : (Number(g.giftId||0) % lanes.length);
+  const points = Math.max(1, Number(g.diamonds||1)) * Math.max(1, Number(g.repeatCount||1));
+  lanes[lane].score += points;
+  addLog(`🎁 <b>${escapeHtml(g.giftName||"Hediye")}</b> ×${g.repeatCount||1} → ${lanes[lane].name} <b>+${points}</b> puan`);
+  render();
+}
+function setConnected(username){
+  statusEl.textContent="● CANLI";
+  statusEl.className="badge live";
+  document.getElementById("userBadge").textContent="@"+username;
+}
+async function connect(username){
+  username=username.replace(/^@/,"").trim();
+  if(!username) return;
+  document.getElementById("username").value=username;
+  try{
+    const r=await fetch("/connect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||"Bağlanamadı");
+    setConnected(username);
+    if(es) es.close();
+    es=new EventSource("/events");
+    es.onmessage=e=>{
+      const msg=JSON.parse(e.data);
+      if(msg.type==="gift") addGift(msg);
+      if(msg.type==="viewer") viewerEl.textContent="İzleyici: "+Number(msg.count||0).toLocaleString("tr-TR");
+      if(msg.type==="connected"){setConnected(msg.username);addLog("✅ TikTok LIVE bağlantısı kuruldu.");}
+      if(msg.type==="error"){statusEl.textContent="HATA";statusEl.className="badge";addLog("⚠️ "+escapeHtml(msg.message||"Bağlantı hatası"));}
+      if(msg.type==="ended"){statusEl.textContent="YAYIN BİTTİ";statusEl.className="badge";addLog("⛔ Yayın sona erdi.");}
+    };
+    es.onerror=()=>{statusEl.textContent="SUNUCU BEKLENİYOR";statusEl.className="badge";};
+  }catch(err){addLog("⚠️ "+escapeHtml(err.message));}
+}
+document.getElementById("connectBtn").onclick=()=>connect(document.getElementById("username").value);
+document.getElementById("startForm").onsubmit=e=>{e.preventDefault();document.getElementById("modal").classList.add("hidden");connect(document.getElementById("modalUsername").value);}
+document.getElementById("demoBtn").onclick=()=>{
+  document.getElementById("modal").classList.add("hidden");
+  statusEl.textContent="DEMO";statusEl.className="badge live";document.getElementById("userBadge").textContent="@demo";
+  let n=0; const gifts=["Rose","Heart","GG","Lion","Fireworks"];
+  const timer=setInterval(()=>{if(n++>25){clearInterval(timer);return;} addGift({giftId:n,laneIndex:n%5,giftName:gifts[n%gifts.length],repeatCount:1+Math.floor(Math.random()*8),diamonds:1+Math.floor(Math.random()*12)});},700);
+};
+render();
+</script>
+</body>
+</html>
