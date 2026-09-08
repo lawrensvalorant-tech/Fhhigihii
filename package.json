@@ -1,15 +1,11 @@
 {
   "name": "tiktok-lion-race",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "tiktok-live-connector": "^2.4.4"
+    "tiktok-live-connector": "1.2.3"
   }
 }

@@ -1,32 +1,31 @@
-# TikTok LIVE Aslan Yarışı
+# TikTok LIVE Aslan Yarışı — Euler gerektirmeyen sürüm
 
-Bu proje, ekrandaki tasarıma benzer bir yarış ekranı oluşturur:
-- Sayfa açılınca TikTok kullanıcı adı ister.
-- Node.js sunucusu TikTok LIVE Webcast verisine bağlanır.
-- Hediyeler gerçek zamanlı alınır.
-- Hediye `elmas × tekrar sayısı` puana çevrilir.
-- Puan ilgili aslanın ilerlemesini sağlar.
-- İzleyici sayısı ve son hediyeler gösterilir.
-- `DEMO` düğmesi gerçek yayın olmadan ekranı test eder.
+Bu sürüm `tiktok-live-connector@1.2.3` kullanır. Yeni sürümlerdeki Euler Stream imzalama akışını kullanmaz.
 
-## Kurulum
+## Render
 
-Node.js 20+ gerekir.
-
-```bash
+Build Command:
 npm install
+
+Start Command:
 npm start
-```
 
-Sonra tarayıcıdan:
+Node:
+20+
 
-`http://localhost:3000`
+## GitHub'a yükle
 
-## Hediye → aslan eşleştirme
+Bu paketteki şu 3 dosyayı GitHub reposundaki eski dosyaların üzerine yükle:
+- package.json
+- server.js
+- index.html
 
-`server.js` içindeki `GIFT_TO_LANE` alanını düzenleyebilirsin:
+Sonra Render'da Manual Deploy -> Deploy latest commit yap.
 
-```js
+## Hediye eşleştirme
+
+server.js içindeki:
+
 const GIFT_TO_LANE = {
   "Rose": 0,
   "Heart": 1,
@@ -34,14 +33,7 @@ const GIFT_TO_LANE = {
   "GG": 3,
   "TikTok": 4
 };
-```
 
-0 = Aslan 1, 1 = Aslan 2 ... 4 = Aslan 5.
+0 Aslan 1, 1 Aslan 2, ... 4 Aslan 5 demektir.
 
-Eşleştirilmemiş hediyeler varsayılan olarak `giftId % 5` ile bir aslana gider.
-
-## Önemli
-
-Saf bir HTML dosyası TikTok LIVE Webcast bağlantısını güvenilir şekilde doğrudan tarayıcıdan yapamaz. Bu nedenle HTML + Node.js backend birlikte kullanılıyor.
-
-Kullanılan `tiktok-live-connector` resmi TikTok API'si değildir; TikTok'un Webcast akışını tersine mühendislik ile okuyan açık kaynak bir Node.js kütüphanesidir. TikTok protokolü değişirse proje güncelleme gerektirebilir.
+Not: `tiktok-live-connector` resmi TikTok API'si değildir. TikTok Webcast protokolünü kullanan topluluk projesidir ve TikTok değişiklikleri nedeniyle zaman zaman güncelleme gerekebilir.
